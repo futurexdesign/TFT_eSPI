@@ -156,8 +156,14 @@
       #define DC_C digitalWrite(TFT_DC, LOW);
       #define DC_D digitalWrite(TFT_DC, HIGH);
     #else
-      #define DC_C sio_hw->gpio_clr = (1ul << TFT_DC)
-      #define DC_D sio_hw->gpio_set = (1ul << TFT_DC)
+      // RP2350B GPIOs >= 32 use SIO high bank (gpio_hi_set/clr)
+      #if (TFT_DC) >= 32
+        #define DC_C sio_hw->gpio_hi_clr = (1ul << ((TFT_DC) - 32))
+        #define DC_D sio_hw->gpio_hi_set = (1ul << ((TFT_DC) - 32))
+      #else
+        #define DC_C sio_hw->gpio_clr = (1ul << TFT_DC)
+        #define DC_D sio_hw->gpio_set = (1ul << TFT_DC)
+      #endif
     #endif
   #else
     // PIO takes control of TFT_DC
@@ -187,8 +193,14 @@
       #define CS_L digitalWrite(TFT_CS, LOW);
       #define CS_H digitalWrite(TFT_CS, HIGH);
     #else
-      #define CS_L sio_hw->gpio_clr = (1ul << TFT_CS)
-      #define CS_H sio_hw->gpio_set = (1ul << TFT_CS)
+      // RP2350B GPIOs >= 32 use SIO high bank (gpio_hi_set/clr)
+      #if (TFT_CS) >= 32
+        #define CS_L sio_hw->gpio_hi_clr = (1ul << ((TFT_CS) - 32))
+        #define CS_H sio_hw->gpio_hi_set = (1ul << ((TFT_CS) - 32))
+      #else
+        #define CS_L sio_hw->gpio_clr = (1ul << TFT_CS)
+        #define CS_H sio_hw->gpio_set = (1ul << TFT_CS)
+      #endif
     #endif
   #else // PIO interface display
     #define CS_L sio_hw->gpio_clr = (1ul << TFT_CS)
